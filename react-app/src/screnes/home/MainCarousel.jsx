@@ -1,4 +1,5 @@
-import { Box, Typography, IconButton, useMediaQuery } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Typography, IconButton, useMediaQuery, Button } from "@mui/material";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
@@ -16,8 +17,22 @@ export const heroTextureImports = importAll(
   require.context("../../assets", false, /\.(png|jpe?g|svg)$/)
 );
 
+
 const MainCarousel = () => {
+  async function getCarousel () {
+    const carousel = await fetch("http://localhost:1337/api/carousels?populate=image", {
+      method: "GET",
+    });
+    const carouselJson = await carousel.json()
+    setCarousel(carouselJson.data[0].attributes)
+  }
+
+  useEffect(() => {
+    getCarousel()
+  }, [])// eslint-disable-line react-hooks/exhaustive-deps
+
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const [carousel, setCarousel] = useState();  
   return (
     <Carousel
       infiniteLoop={true}
@@ -55,10 +70,12 @@ const MainCarousel = () => {
         </IconButton>
       )}
     >
-      {Object.values(heroTextureImports).map((texture, index) => (
-        <Box key={`carousel-image-${index}`}>
+      {carousel?.image?.data.map((texture, index) => (
+        <Box key={`carousel-image-${index}`}
+        sx={{marginTop: "60px"}}
+      >
           <img
-            src={texture}
+            src={`http://localhost:1337${texture.attributes.url}`}
             alt={`carousel-${index}`}
             style={{
               width: "100%",
@@ -78,10 +95,13 @@ const MainCarousel = () => {
             left={isNonMobile ? "10%" : "0"}
             right={isNonMobile ? undefined : "0"}
             margin={isNonMobile ? undefined : "0 auto"}
-            maxWidth={isNonMobile ? undefined : "240px"}
+            maxWidth={isNonMobile ? "503px" : "50%"}
           >
             <Typography color={shades.secondary[200]}>-- NEW ITEMS</Typography>
-            <Typography variant="h1">Summer Sale</Typography>
+            <Typography
+            variant={isNonMobile ? "h1" : "h3"}
+            
+            >{carousel.description}</Typography>
             <Typography
               fontWeight="bold"
               color={shades.secondary[300]}

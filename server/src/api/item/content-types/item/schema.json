@@ -1,14 +1,14 @@
 {
   "kind": "collectionType",
-  "collectionName": "names",
+  "collectionName": "items",
   "info": {
-    "singularName": "name",
-    "pluralName": "names",
-    "displayName": "item",
+    "singularName": "item",
+    "pluralName": "items",
+    "displayName": "Item",
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -39,7 +39,7 @@
       "type": "enumeration",
       "enum": [
         "newArrivals",
-        "bestSeller",
+        "bestSellers",
         "topRated"
       ]
     }

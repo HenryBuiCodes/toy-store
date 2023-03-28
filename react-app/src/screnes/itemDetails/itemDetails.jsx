@@ -66,10 +66,10 @@ const ItemDetails = () => {
 
         {/* ACTIONS */}
         <Box flex="1 1 50%" mb="40px">
-          <Box display="flex" justifyContent="space-between">
+          {/* <Box display="flex" justifyContent="space-between">
             <Box>Home/Item</Box>
             <Box>Prev Next</Box>
-          </Box>
+          </Box> */}
 
           <Box m="65px 0 25px 0">
             <Typography variant="h3">{item?.attributes?.name}</Typography>

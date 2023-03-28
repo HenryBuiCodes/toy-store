@@ -67,9 +67,10 @@ const Item = ({ item, width }) => {
             </Box>
             <Button
               onClick={() => {
+                console.log(item);
                 dispatch(addToCart({ item: { ...item, count } }));
               }}
-              sx={{ backgroundColor: shades.primary[300], color: "white" }}
+              sx={{ backgroundColor: shades.primary[300], color: "white"}}
             >
               Add to Cart
             </Button>
@@ -78,11 +79,15 @@ const Item = ({ item, width }) => {
       </Box>
 
       <Box mt="3px">
-        <Typography variant="subtitle2" color={neutral.dark}>
+        <Box display="flex" justifyContent="start" alignItems="end"  fontWeight="semibold">
+          <Typography  fontSize="14px" >Category:&nbsp;</Typography>
+        <Typography variant="subtitle2" >
           {category
             .replace(/([A-Z])/g, " $1")
             .replace(/^./, (str) => str.toUpperCase())}
         </Typography>
+
+        </Box>
         <Typography>{name}</Typography>
         <Typography fontWeight="bold">${price}</Typography>
       </Box>

@@ -22,7 +22,10 @@ const FlexBox = styled(Box)`
 const CartMenu = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const cart = useSelector((state) => state.cart.cart);
+  const cart = useSelector((state) => {
+    console.log("🚀 ~ file: CartMenu.jsx:26 ~ CartMenu ~ state:", state)
+    return state.cart.cart
+  })
   const isCartOpen = useSelector((state) => state.cart.isCartOpen);
 
   const totalPrice = cart.reduce((total, item) => {
