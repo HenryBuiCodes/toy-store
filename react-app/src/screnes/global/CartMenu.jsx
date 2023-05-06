@@ -1,4 +1,4 @@
-import { Box, Button, Divider, IconButton, Typography } from "@mui/material";
+import { Box, Divider, IconButton, Typography } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -12,6 +12,7 @@ import {
   setIsCartOpen,
 } from "../../state";
 import { useNavigate } from "react-router-dom";
+import ClassNames from "../../helper/classNames";
 
 const FlexBox = styled(Box)`
   display: flex;
@@ -22,10 +23,11 @@ const FlexBox = styled(Box)`
 const CartMenu = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const cart = useSelector((state) => {
-    console.log("🚀 ~ file: CartMenu.jsx:26 ~ CartMenu ~ state:", state)
-    return state.cart.cart
-  })
+    return state.cart.cart;
+  });
+
   const isCartOpen = useSelector((state) => state.cart.isCartOpen);
 
   const totalPrice = cart.reduce((total, item) => {
@@ -127,22 +129,24 @@ const CartMenu = () => {
               <Typography fontWeight="bold">SUBTOTAL</Typography>
               <Typography fontWeight="bold">${totalPrice}</Typography>
             </FlexBox>
-            <Button
-              sx={{
-                backgroundColor: shades.primary[400],
-                color: "white",
-                borderRadius: 0,
-                minWidth: "100%",
-                padding: "20px 40px",
-                m: "20px 0",
-              }}
+            <button
+              className={ClassNames(
+                cart.length !== 0
+                  ? "hover:bg-white hover:text-black bg-black text-white"
+                  : "hover:bg-white hover:text-red-400 text-red-400 bg-white border-2",
+                "  min-w-full py-5 px-10 my-5 mx-0 hover:border-2 rounded-md"
+              )}
               onClick={() => {
-                navigate("/checkout");
-                dispatch(setIsCartOpen({}));
+                if (cart.length !== 0) {
+                  navigate("/checkout");
+                  dispatch(setIsCartOpen({}));
+                }
               }}
             >
-              CHECKOUT
-            </Button>
+              {cart.length === 0
+                ? "Please add item to your shopping bag"
+                : "CHECKOUT"}
+            </button>
           </Box>
         </Box>
       </Box>

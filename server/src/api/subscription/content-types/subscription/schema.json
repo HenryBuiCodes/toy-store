@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "subscriptions",
+  "info": {
+    "singularName": "subscription",
+    "pluralName": "subscriptions",
+    "displayName": "Subscription"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "CustomerEmail": {
+      "type": "email"
+    },
+    "CustomerData": {
+      "type": "json"
+    }
+  }
+}

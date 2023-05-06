@@ -37,10 +37,10 @@ const Item = ({ item, width }) => {
         <img
           alt={item.name}
           width="300px"
-          height="400px"
+          height="450px"
           src={`http://localhost:1337${url}`}
           onClick={() => navigate(`/item/${item.id}`)}
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", height: "450px" }}
         />
         <Box
           display={isHovered ? "block" : "none"}
@@ -67,7 +67,6 @@ const Item = ({ item, width }) => {
             </Box>
             <Button
               onClick={() => {
-                console.log(item);
                 dispatch(addToCart({ item: { ...item, count } }));
               }}
               sx={{ backgroundColor: shades.primary[300], color: "white"}}
@@ -88,7 +87,11 @@ const Item = ({ item, width }) => {
         </Typography>
 
         </Box>
+        <Box display="flex" justifyContent="start" alignItems="end"  fontWeight="semibold">
+        <Typography  fontSize="14px" >Name:&nbsp;</Typography>
         <Typography>{name}</Typography>
+
+        </Box>
         <Typography fontWeight="bold">${price}</Typography>
       </Box>
     </Box>

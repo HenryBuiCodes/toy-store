@@ -7,6 +7,7 @@ import { shades } from "../../theme";
 import Payment from "./Payment";
 import Shipping from "./Shipping";
 import { loadStripe } from "@stripe/stripe-js";
+import orderApi from "../../api/order";
 
 const stripePromise = loadStripe(
   "pk_test_51MopRJCJImsIoEVaB0j0vJ8JfTcVNakTkA4XIwMzPC8lY3oFqWLSxIfRVPsRWzENf0wI7edi0KxND7rVTM9Y76iP00LsRIqsCp"
@@ -21,7 +22,6 @@ const Checkout = () => {
   const handleFormSubmit = async (values, actions) => {
     setActiveStep(activeStep + 1);
 
-    // this copies the billing address onto shipping address
     if (isFirstStep && values.shippingAddress.isSameAddress) {
       actions.setFieldValue("shippingAddress", {
         ...values.billingAddress,
@@ -52,6 +52,7 @@ const Checkout = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestBody),
     });
+
     const session = await response.json();
     await stripe.redirectToCheckout({
       sessionId: session.id,

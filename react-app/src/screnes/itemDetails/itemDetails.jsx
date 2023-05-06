@@ -4,12 +4,12 @@ import Tab from "@mui/material/Tab";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Item from "../../components/Item";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { shades } from "../../theme";
 import { addToCart } from "../../state";
 import { useDispatch } from "react-redux";
+import Comment from "../../components/Comment";
 
 const ItemDetails = () => {
   const dispatch = useDispatch();
@@ -52,7 +52,7 @@ const ItemDetails = () => {
 
   return (
     <Box width="80%" m="80px auto">
-      <Box display="flex" flexWrap="wrap" columnGap="40px">
+      <Box display="flex" flexWrap="wrap" columnGap="40px" rowGap="40px">
         {/* IMAGES */}
         <Box flex="1 1 40%" mb="40px">
           <img
@@ -66,16 +66,11 @@ const ItemDetails = () => {
 
         {/* ACTIONS */}
         <Box flex="1 1 50%" mb="40px">
-          {/* <Box display="flex" justifyContent="space-between">
-            <Box>Home/Item</Box>
-            <Box>Prev Next</Box>
-          </Box> */}
-
           <Box m="65px 0 25px 0">
             <Typography variant="h3">{item?.attributes?.name}</Typography>
-            <Typography>${item?.attributes?.price}</Typography>
-            <Typography sx={{ mt: "20px" }}>
-              {item?.attributes?.longDescription}
+            <Typography mt="20px">${item?.attributes?.price}</Typography>
+            <Typography sx={{ mt: "20px" }} className="whitespace-pre-wrap">
+              {item?.attributes?.shortDescription}
             </Typography>
           </Box>
 
@@ -87,7 +82,7 @@ const ItemDetails = () => {
               mr="20px"
               p="2px 5px"
             >
-              <IconButton onClick={() => setCount(Math.max(count - 1, 0))}>
+              <IconButton onClick={() => setCount(Math.max(count - 1, 1))}>
                 <RemoveIcon />
               </IconButton>
               <Typography sx={{ p: "0 5px" }}>{count}</Typography>
@@ -95,31 +90,26 @@ const ItemDetails = () => {
                 <AddIcon />
               </IconButton>
             </Box>
-            <Button
-              sx={{
-                backgroundColor: "#222222",
-                color: "white",
-                borderRadius: 0,
-                minWidth: "150px",
-                padding: "10px 40px",
-              }}
+            <button
+              className="border rounded-md hover:text-gray-900 px-10 py-2 bg-gray-900 text-white hover:bg-white"
               onClick={() => dispatch(addToCart({ item: { ...item, count } }))}
             >
               ADD TO CART
-            </Button>
+            </button>
           </Box>
           <Box>
-            <Box m="20px 0 5px 0" display="flex">
-              <FavoriteBorderOutlinedIcon />
-              <Typography sx={{ ml: "5px" }}>ADD TO WISHLIST</Typography>
-            </Box>
-            <Typography>CATEGORIES: {item?.attributes?.category}</Typography>
+            <Typography mt="20px">
+              CATEGORIES:{" "}
+              {item?.attributes?.category
+                .replace(/([A-Z])/g, " $1")
+                .replace(/^./, (str) => str.toUpperCase())}
+            </Typography>
           </Box>
         </Box>
       </Box>
 
       {/* INFORMATION */}
-      <Box m="20px 0">
+      <Box m="20px 0" className="">
         <Tabs value={value} onChange={handleChange}>
           <Tab label="DESCRIPTION" value="description" />
           <Tab label="REVIEWS" value="reviews" />
@@ -127,9 +117,11 @@ const ItemDetails = () => {
       </Box>
       <Box display="flex" flexWrap="wrap" gap="15px">
         {value === "description" && (
-          <div>{item?.attributes?.longDescription}</div>
+          <div className="whitespace-pre-wrap text-sm">
+            {item?.attributes?.longDescription}
+          </div>
         )}
-        {value === "reviews" && <div>reviews</div>}
+        {value === "reviews" && <Comment productId={itemId} />}
       </Box>
 
       {/* RELATED ITEMS */}

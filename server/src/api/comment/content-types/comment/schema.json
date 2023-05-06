@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "comments",
+  "info": {
+    "singularName": "comment",
+    "pluralName": "comments",
+    "displayName": "Comment",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "productComment": {
+      "type": "richtext"
+    },
+    "productId": {
+      "type": "integer"
+    },
+    "userId": {
+      "type": "integer"
+    }
+  }
+}
