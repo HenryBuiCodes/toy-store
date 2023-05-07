@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
-  Avatar,
   Badge,
   Box,
   Divider,
@@ -13,18 +12,15 @@ import {
 import {
   PersonOutline,
   ShoppingBagOutlined,
-  MenuOutlined,
-  SearchOutlined,
-  PersonAdd,
-  Settings,
   Logout,
   Login,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { shades } from "../../theme";
 import { setIsCartOpen } from "../../state";
-import logo from "../../public/images/TOY WORLD.png";
 import { useState } from "react";
+import { getUserId, getUserName } from "../../helper/auth";
+import { USER_ID, USER_NAME } from "../../constant";
 
 const importAll = (r) =>
   r.keys().reduce((acc, item) => {
@@ -42,11 +38,17 @@ function Navbar() {
   const cart = useSelector((state) => state.cart.cart);
   const [anchorEl, setAnchorEl] = useState();
   const open = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const capitalName = (str) => {
+    return str.replace(/\b\w/g, (match) => match.toUpperCase());
   };
 
   return (
@@ -82,6 +84,27 @@ function Navbar() {
           columnGap="20px"
           zIndex="2"
         >
+          <Badge
+            badgeContent={cart.length}
+            color="secondary"
+            invisible={cart.length === 0}
+            sx={{
+              "& .MuiBadge-badge": {
+                right: 5,
+                top: 5,
+                padding: "0 4px",
+                height: "14px",
+                minWidth: "13px",
+              },
+            }}
+          >
+            <IconButton
+              onClick={() => dispatch(setIsCartOpen({}))}
+              sx={{ color: "black" }}
+            >
+              <ShoppingBagOutlined />
+            </IconButton>
+          </Badge>
           <IconButton sx={{ color: "black" }}>
             <Tooltip title="Account settings">
               <IconButton
@@ -130,46 +153,32 @@ function Navbar() {
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
               <MenuItem onClick={handleClose}>
-                <Avatar /> My account
+                {getUserName() !== "undefined"
+                  ? capitalName(getUserName())
+                  : "My Account"}
               </MenuItem>
               <Divider />
-              <MenuItem onClick={() => navigate("/login")}>
-                <ListItemIcon>
-                  <Login fontSize="small" />
-                </ListItemIcon>
-                Login
-              </MenuItem>
-              <MenuItem onClick={() => navigate("/")}>
-                <ListItemIcon>
-                  <Logout fontSize="small" />
-                </ListItemIcon>
-                Logout
-              </MenuItem>
+              {Number(getUserId()) === 0 ? (
+                <MenuItem onClick={() => navigate("/login")}>
+                  <ListItemIcon>
+                    <Login fontSize="small" />
+                  </ListItemIcon>
+                  Login
+                </MenuItem>
+              ) : (
+                <MenuItem
+                  onClick={() => {
+                    localStorage.setItem(USER_ID, 0);
+                    localStorage.setItem(USER_NAME, "undefined");
+                  }}
+                >
+                  <ListItemIcon>
+                    <Logout fontSize="small" />
+                  </ListItemIcon>
+                  Logout
+                </MenuItem>
+              )}
             </Menu>
-          </IconButton>
-          <Badge
-            badgeContent={cart.length}
-            color="secondary"
-            invisible={cart.length === 0}
-            sx={{
-              "& .MuiBadge-badge": {
-                right: 5,
-                top: 5,
-                padding: "0 4px",
-                height: "14px",
-                minWidth: "13px",
-              },
-            }}
-          >
-            <IconButton
-              onClick={() => dispatch(setIsCartOpen({}))}
-              sx={{ color: "black" }}
-            >
-              <ShoppingBagOutlined />
-            </IconButton>
-          </Badge>
-          <IconButton sx={{ color: "black" }}>
-            <MenuOutlined />
           </IconButton>
         </Box>
       </Box>

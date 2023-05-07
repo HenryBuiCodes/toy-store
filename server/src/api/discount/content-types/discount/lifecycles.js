@@ -3,10 +3,7 @@ module.exports = {
     const { result } = event;
     discountCode = result.DiscountCode;
     discountCodeId = result.id;
-    console.log(
-      "🚀 ~ file: lifecycles.js:6 ~ afterCreate ~ discountCodeId:",
-      discountCodeId
-    );
+
     const discountEmailTemplate = `<!doctype html>
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
@@ -275,18 +272,13 @@ module.exports = {
           subject: "We send you your Welcome discount code",
           html: discountEmailTemplate,
         });
-      console.log(element);
       const customerDiscountData = element.CustomerData?.discountId || [];
-      console.log(customerDiscountData);
       const newCustomerDiscountData = customerDiscountData.includes(
         discountCodeId
       )
         ? customerDiscountData
         : [...customerDiscountData, discountCodeId];
-      console.log(
-        "🚀 ~ file: lifecycles.js:284 ~ awaitresultFilter.forEach ~ newCustomerDiscountData:",
-        newCustomerDiscountData
-      );
+
       try {
         strapi.service("api::subscription.subscription").update(element.id, {
           data: {
@@ -296,12 +288,8 @@ module.exports = {
           },
         });
       } catch (error) {
-        console.log(error);
       }
     });
   },
-  // async beforeCreate(event) {
-  //   console.log("before");
-  //   console.log("before", event);
-  // },
+
 };

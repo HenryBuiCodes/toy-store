@@ -18,7 +18,6 @@ module.exports = createCoreController(
 
       const currentDate = moment(new Date());
       const discountDate = moment(newCustomerDiscount.createdAt);
-      // console.log(currentDate.diff(discountDate, "days"));
 
       const discountEmailTemplate = `<!doctype html>
       <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -268,7 +267,6 @@ module.exports = createCoreController(
           CustomerData: { discountId: [1] },
         },
       });
-      // console.log(discountEmail);
       //sent email
       await strapi
         .plugin("email")

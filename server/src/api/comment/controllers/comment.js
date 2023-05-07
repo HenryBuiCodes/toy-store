@@ -22,6 +22,10 @@ module.exports = createCoreController("api::comment.comment", ({ strapi }) => ({
           .findOne({
             where: { id: result.userId },
           });
+        console.log(
+          "🚀 ~ file: comment.js:25 ~ results.map ~ userInformation:",
+          userInformation
+        );
 
         return {
           id: result.id,

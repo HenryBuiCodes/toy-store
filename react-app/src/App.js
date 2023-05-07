@@ -10,6 +10,7 @@ import Login from "./screnes/authPage/Login";
 import Register from "./screnes/authPage/Register";
 import NotFoundPage from "./screnes/NotFoundPage";
 import AuthProvider from "./components/AuthProvider";
+import { getToken } from "./helper/auth";
 
 function App() {
   return (

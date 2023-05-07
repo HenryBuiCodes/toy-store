@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "order_informations",
+  "info": {
+    "singularName": "order-information",
+    "pluralName": "order-informations",
+    "displayName": "OrderInformation",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "order": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::order.order"
+    },
+    "ShippingAddress": {
+      "type": "text",
+      "required": true
+    },
+    "BillingAddress": {
+      "type": "text"
+    },
+    "items": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::item.item"
+    },
+    "TotalPrice": {
+      "type": "float"
+    },
+    "CustomerEmail": {
+      "type": "email"
+    },
+    "CustomerPhoneNumber": {
+      "type": "biginteger"
+    }
+  }
+}

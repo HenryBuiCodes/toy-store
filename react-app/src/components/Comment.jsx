@@ -3,32 +3,38 @@ import { useEffect, useState } from "react";
 import SmsOutlinedButton from "@mui/icons-material/SmsOutlined";
 import CommentApi from "../api/comment";
 import { useNavigate } from "react-router-dom";
+import { getUserId } from "../helper/auth";
 
 const Comment = ({ productId }) => {
   const [comment, setComment] = useState("");
-  const [customerId, setCustomerId] = useState();
   const [open, setOpen] = useState(false);
+  const [initial, setInitial] = useState(false);
   const navigate = useNavigate();
-  const [productComments, setProductComments] = useState();
+  const [productComments, setProductComments] = useState([]);
+  const userID = getUserId();
 
   const handleComment = (e) => {
     setComment(e.target.value);
   };
   const handleSubmit = () => {
-    if (comment.length > 0 && customerId) {
-      CommentApi.create(comment, productId);
-      setComment("");
+    if (comment.length > 0 && userID !== 0) {
+      CommentApi.create(comment, productId, userID)
+        .then(() => {
+          setComment("");
+          setInitial(!initial);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } else {
       setOpen(true);
     }
   };
   useEffect(() => {
-    console.log("productId", productId);
     CommentApi.index(productId).then((response) => {
       setProductComments(response.data);
     });
-  }, []);
-  console.log("productComments", productComments);
+  }, [initial]);
 
   return (
     <>
@@ -52,16 +58,28 @@ const Comment = ({ productId }) => {
       </Box>
       <Box className="mt-5 border-t-2 border-gray-900 grid gap-5 w-full">
         <p className="text-sm text-gray-900 uppercase p-2">Customer Review</p>
-        <Box className="border rounded-md w-full p-2 grid gap-2">
-          {productComments?.map((item) => (
+        {productComments.length > 0 ? (
+          <Box className="border rounded-md w-full p-2 grid gap-2">
+            {productComments?.map((item) => (
+              <Box className="border rounded-md w-full ">
+                <p className="text-sm text-gray-900  p-2">
+                  {item.user.username}
+                </p>
+                <pre className="text-sm text-gray-900  p-2">
+                  {item.productComment}
+                </pre>
+              </Box>
+            ))}
+          </Box>
+        ) : (
+          <Box className="border rounded-md w-full p-2 grid gap-2">
             <Box className="border rounded-md w-full ">
-              <p className="text-sm text-gray-900  p-2">{item.user.username}</p>
-              <pre className="text-sm text-gray-900  p-2">
-                {item.productComment}
-              </pre>
+              <p className="text-sm text-gray-900  p-2">
+                Lets be the first person to comment on this product
+              </p>
             </Box>
-          ))}
-        </Box>
+          </Box>
+        )}
       </Box>
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box
