@@ -20,6 +20,13 @@
     },
     "stripeSessionId": {
       "type": "string"
+    },
+    "PaymentMethod": {
+      "type": "enumeration",
+      "enum": [
+        "Pay with card",
+        "Pay on delivery"
+      ]
     }
   }
 }

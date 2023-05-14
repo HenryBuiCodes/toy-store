@@ -4,6 +4,7 @@ const cookies = new Cookies();
 
 const initialState = {
   isCartOpen: false,
+  isCategoryOpen: false,
   cart: cookies.get("addToCartList") || [],
   items: [],
 };
@@ -77,6 +78,9 @@ export const cartSlice = createSlice({
     setIsCartOpen: (state) => {
       state.isCartOpen = !state.isCartOpen;
     },
+    setIsCategoryOpen: (state) => {
+      state.isCategoryOpen = !state.isCategoryOpen;
+    },
   },
 });
 
@@ -88,6 +92,7 @@ export const {
   increaseCount,
   decreaseCount,
   setIsCartOpen,
+  setIsCategoryOpen,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

@@ -18,6 +18,7 @@ module.exports = createCoreController("api::order.order", ({ strapi }) => ({
       shippingAddress,
       customerEmail,
       customerPhoneNumber,
+      paymentMethod,
     } = ctx.request.body;
 
     const discountData = await strapi.db
@@ -55,6 +56,8 @@ module.exports = createCoreController("api::order.order", ({ strapi }) => ({
               // Discount code has expired
               discountPrice = 0;
             }
+          } else {
+            discountPrice = 0;
           }
 
           const productPrice = (item.price - Math.ceil(discountPrice)) * 100;
@@ -71,35 +74,54 @@ module.exports = createCoreController("api::order.order", ({ strapi }) => ({
           };
         })
       );
-      console.log("🚀 ~ file: order.js:72 ~ create ~ lineItems:", lineItems);
 
+      let session;
+      let order;
+      if (paymentMethod === "payment_card") {
+        session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          customer_email: email,
+          mode: "payment",
+          success_url: "http://localhost:3000/checkout/success",
+          cancel_url: "http://localhost:3000",
+          line_items: lineItems,
+        });
+
+        const orderProduct = {
+          product_information: products,
+        };
+
+        // create the item
+        order = await strapi.service("api::order.order").create({
+          data: {
+            userName,
+            products: orderProduct,
+            stripeSessionId: session.id,
+            PaymentMethod:
+              paymentMethod === "payment_pending"
+                ? "Pay on delivery"
+                : "Pay with card",
+          },
+        });
+      }
+      if (paymentMethod === "payment_pending") {
+        const orderProduct = {
+          product_information: products,
+        };
+
+        // create the item
+        order = await strapi.service("api::order.order").create({
+          data: {
+            userName,
+            products: orderProduct,
+            PaymentMethod:
+              paymentMethod === "payment_pending"
+                ? "Pay on delivery"
+                : "Pay with card",
+          },
+        });
+      }
       // create a stripe session
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        customer_email: email,
-        mode: "payment",
-        success_url: "http://localhost:3000/checkout/success",
-        cancel_url: "http://localhost:3000",
-        line_items: lineItems,
-      });
-
-      const orderProduct = {
-        product_information: products,
-        discountCode: {
-          discount_code: discountData.DiscountCode,
-          discount_percentage: discountData.DiscountPercentage,
-          valid_time: discountData.ValidTime,
-        },
-      };
-
-      // create the item
-      const order = await strapi.service("api::order.order").create({
-        data: {
-          userName,
-          products: orderProduct,
-          stripeSessionId: session.id,
-        },
-      });
       const orderInformationsItemsID = products.map((product) => {
         return product.id;
       });
@@ -140,7 +162,7 @@ module.exports = createCoreController("api::order.order", ({ strapi }) => ({
             return (lineItem.price_data.unit_amount / 100) * lineItem.quantity;
           })
           .reduce((acc, cur) => acc + cur, 0) *
-          (100 - discountPercentage)) /
+          (100 - (discountPercentage | 0))) /
         100;
 
       await strapi.service("api::order-information.order-information").create({
@@ -149,14 +171,16 @@ module.exports = createCoreController("api::order.order", ({ strapi }) => ({
           ShippingAddress: orderInformationsShippingAddress,
           BillingAddress: orderInformationsBillingAddress,
           items: orderInformationsItemsID,
-          TotalPrice: Math.ceil(totalPrice),
+          TotalPrice: Number(Math.ceil(totalPrice)),
           CustomerEmail: customerEmail,
           CustomerPhoneNumber: customerPhoneNumber,
         },
       });
 
+      const returnValue =
+        paymentMethod === "payment_card" ? { id: session.id } : "done";
       // return the session id
-      return { id: session.id };
+      return returnValue;
     } catch (error) {
       ctx.response.status = 500;
       console.log(error);

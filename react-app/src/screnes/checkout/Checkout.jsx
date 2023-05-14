@@ -9,12 +9,13 @@ import {
   TextField,
 } from "@mui/material";
 import { Formik } from "formik";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as yup from "yup";
 import { shades } from "../../theme";
 import Payment from "./Payment";
 import Shipping from "./Shipping";
 import { loadStripe } from "@stripe/stripe-js";
+import { useNavigate } from "react-router-dom";
 
 const stripePromise = loadStripe(
   "pk_test_51MopRJCJImsIoEVaB0j0vJ8JfTcVNakTkA4XIwMzPC8lY3oFqWLSxIfRVPsRWzENf0wI7edi0KxND7rVTM9Y76iP00LsRIqsCp"
@@ -24,6 +25,9 @@ const Checkout = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [discountCode, setDiscountCode] = useState("");
   const cart = useSelector((state) => state.cart.cart);
+  const [paymentMethod, setPaymentMethod] = useState("payment_card");
+  const navigate = useNavigate();
+
   const isFirstStep = activeStep === 0;
   const isSecondStep = activeStep === 1;
   const isThirdStep = activeStep === 2;
@@ -54,6 +58,7 @@ const Checkout = () => {
 
   async function makePayment(values) {
     const stripe = await stripePromise;
+
     const requestBody = {
       userName: [
         values.billingAddress.firstName,
@@ -69,6 +74,7 @@ const Checkout = () => {
         id,
         count,
       })),
+      paymentMethod: paymentMethod,
     };
 
     const response = await fetch("http://localhost:1337/api/orders", {
@@ -77,17 +83,26 @@ const Checkout = () => {
       body: JSON.stringify(requestBody),
     });
 
-    const session = await response.json();
-    await stripe.redirectToCheckout({
-      sessionId: session.id,
-    });
+    if (paymentMethod === "payment_card") {
+      const session = await response.json();
+      await stripe.redirectToCheckout({
+        sessionId: session.id,
+      });
+    } else {
+      navigate("/checkout/success");
+    }
   }
+
+  const handlePaymentMethodClick = (e) => {
+    const targetRadio = e.target.querySelector("input[type='radio']");
+    setPaymentMethod(targetRadio.id);
+  };
 
   return (
     <Box width="80%" m="100px auto">
       <Stepper activeStep={activeStep} sx={{ m: "20px 0" }}>
         <Step>
-          <StepLabel>Discount Code</StepLabel>
+          <StepLabel>Checkout and Discounts</StepLabel>
         </Step>
         <Step>
           <StepLabel>Billing</StepLabel>
@@ -114,9 +129,44 @@ const Checkout = () => {
             <form onSubmit={handleSubmit}>
               {isFirstStep && (
                 <Box
-                  className="w-full flex items-center justify-center"
-                  style={{ height: "calc(100vh - 611px)" }}
+                  className="w-full flex flex-col gap-10 items-center justify-center"
+                  style={{ height: "calc(100vh - 601px)" }}
                 >
+                  <p className="w-full text-left">1. Payment Method</p>
+                  <Box className="grid grid-cols-2 gap-10 w-full">
+                    <Box className="w-full flex  items-center justify-center">
+                      <Box
+                        className="flex gap-5 justify-center items-center text-lg border rounded-md w-1/2 p-2 cursor-pointer"
+                        onClick={handlePaymentMethodClick}
+                      >
+                        <input
+                          type="radio"
+                          name="payment_method"
+                          id="payment_pending"
+                          checked={paymentMethod === "payment_pending"}
+                          onChange={handlePaymentMethodClick}
+                        />
+                        Pay on Delivery
+                      </Box>
+                    </Box>
+                    <Box className="w-full flex  items-center justify-center">
+                      <Box
+                        className="flex gap-5 justify-center items-center text-lg border rounded-md w-1/2 p-2 cursor-pointer"
+                        onClick={handlePaymentMethodClick}
+                      >
+                        <input
+                          type="radio"
+                          name="payment_method"
+                          id="payment_card"
+                          checked={paymentMethod === "payment_card"}
+                          onChange={handlePaymentMethodClick}
+                        />
+                        Card payment
+                      </Box>
+                    </Box>
+                  </Box>
+                  <p className="w-full text-left">2. Your Discount Code</p>
+
                   <TextField
                     fullWidth
                     type="text"
@@ -156,7 +206,12 @@ const Checkout = () => {
                   <CircularProgress />
                 </Box>
               )}
-              <Box display="flex" justifyContent="space-between" gap="50px">
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                gap="50px"
+                mt="20px"
+              >
                 {!isFirstStep && (
                   <Button
                     fullWidth

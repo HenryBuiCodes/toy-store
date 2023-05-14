@@ -12,12 +12,13 @@ import {
 import {
   PersonOutline,
   ShoppingBagOutlined,
+  MenuOutlined,
   Logout,
   Login,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { shades } from "../../theme";
-import { setIsCartOpen } from "../../state";
+import { setIsCartOpen, setIsCategoryOpen } from "../../state";
 import { useState } from "react";
 import { getUserId, getUserName } from "../../helper/auth";
 import { USER_ID, USER_NAME } from "../../constant";
@@ -179,6 +180,12 @@ function Navbar() {
                 </MenuItem>
               )}
             </Menu>
+          </IconButton>
+          <IconButton
+            onClick={() => dispatch(setIsCategoryOpen({}))}
+            sx={{ color: "black" }}
+          >
+            <MenuOutlined />
           </IconButton>
         </Box>
       </Box>

@@ -2,7 +2,7 @@ import { useTheme } from "@emotion/react";
 import { Box, Typography, Modal } from "@mui/material";
 import { shades } from "../../theme";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Footer() {
   const {
